@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categoria — EconomizaLeitor</title>
+  <meta name="description" content="Livros de uma categoria com comparação de preços.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header data-component="header"></header>
+
+  <main>
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Trilha de navegação" data-breadcrumb>
+        <a href="index.html">Home</a><span class="breadcrumb__sep">›</span>
+        <a href="categorias.html">Categorias</a>
+      </nav>
+
+      <div class="section__head">
+        <h1 class="section__title" data-titulo>Categoria</h1>
+      </div>
+
+      <div class="toolbar">
+        <label class="sr-only" for="ordenar">Ordenar por</label>
+        <select class="select" id="ordenar" data-ordenar>
+          <option value="menor-preco">Menor preço</option>
+          <option value="titulo">Título (A–Z)</option>
+        </select>
+      </div>
+
+      <div class="grid grid--cards" data-livros aria-live="polite"></div>
+    </div>
+  </main>
+
+  <footer data-component="footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/precos.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/pages/categoria.js"></script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+# Arquitetura do Site - EconomizaLeitor
+
+Site estático: HTML + CSS + JavaScript vanilla. Sem build, sem framework, sem
+dependências. Hospedagem em qualquer host estático.
+
+Toda rota é um arquivo .html com parâmetros em query string.
+
+## Mapa do site
+
+Home (index.html)
+├── Todos os Livros (livros.html)
+├── Categorias (categorias.html)
+│   └── Categoria Específica (categoria.html?slug=)
+├── Autores (autores.html)
+│   └── Autor Específico (autor.html?id=&nome=)
+└── Detalhes do Livro (livro.html?id=&titulo=)
+
+## Tabela de Páginas
+
+| Página | Arquivo | Objetivo | Parâmetros |
+| --- | --- | --- | --- |
+| Home | `index.html` | Busca rápida e navegação inicial | — |
+| Todos os Livros | `livros.html` | Catalogação geral, listagem e busca | `q`, `categoria` |
+| Categorias | `categorias.html` | Segmentação por gênero literário | — |
+| Categoria | `categoria.html` | Livros de uma categoria | `slug` |
+| Autores | `autores.html` | Diretório de autores | `q`, `pagina` |
+| Autor | `autor.html` | Ficha do autor e seus livros | `id`, `nome` |
+| Detalhes do Livro | `livro.html` | Comparação de preços de um item | `id`, `titulo` |
+
+Parâmetros de URL:
+
+- `q` — termo de busca (título, autor ou ISBN).
+- `categoria` — slug de uma das 25 categorias.
+- `slug` — slug de categoria.
+- `id` — identificador do livro (ver "Identificadores") ou do autor (`OL...A`).
+- `titulo` — título do livro, usado como pista de fallback quando o `id` falha.
+- `nome` — nome do autor, usado para resolver a chave `OL...A` e listar os livros.
+
+## Identificadores de livro
+
+O parâmetro `id` aceita três formatos:
+
+1. **Google Books** — id de volume, ex.: `aBcDeFgH`. Retornado por
+   `volumes?q=...` e resolvido por `volumes/{id}`.
+2. **Open Library** — `ol:/works/OL1168083W`. Prefixo `ol:` + chave da obra.
+3. **ISBN** — 10 ou 13 dígitos, com ou sem hífen. Resolvido via
+   `openlibrary.org/isbn/{isbn}.json`.
+
+A resolução de ISBN é tentada quando o `id` não começa com `ol:` e a busca
+textual pelo `titulo` também falha. O ISBN é normalizado removendo hífens e
+espaços. A edição não tem sinopse: a resolução busca a obra apontada por
+`works[0].key` para trazer sinopse, capa e assuntos.
+
+## Fontes de dados
+
+| Fonte | Uso | Quando falha |
+| --- | --- | --- |
+| Google Books API | Fonte principal: busca, metadados, sinopse, capa, editora, ISBN, páginas, idioma | Cai para o Open Library |
+| Open Library | Fallback de busca; fonte de autores e de resolução por ISBN | Estado de erro |
+| Preços | Mock determinístico local (ver "Preços") | — |
+
+Regras:
+
+- **Chave opcional.** `ns.CONFIG.GOOGLE_BOOKS_API_KEY` (vazio por padrão). Sem
+  chave, a cota anônima do Google Books se esgota e a API responde HTTP 429.
+- **Degradação.** Um 429 ou 429-excedente marca o Google Books como
+  indisponível **para a sessão inteira** e o roteamento vai direto para o
+  Open Library, sem repetir requisições esgotadas. A interface é avisada por
+  `ns.aoMudarStatus(fn)` e passa a exibir um aviso no rodapé.
+- **Cache.** `localStorage`, chave `economizaleitor:cache:{chave}`, TTL de 12 horas.
+  Falha de cache nunca interrompe a página.
+- **Concorrência.** No máximo 4 requisições em voo por vez (Open Library).
+- **Timeout.** 12 segundos por requisição, com `AbortController`.
+
+Endpoints usados:
+
+- `https://www.googleapis.com/books/v1/volumes?q=...&maxResults=N&printType=books[&key=...]`
+- `https://www.googleapis.com/books/v1/volumes/{id}`
+- `https://openlibrary.org/search.json?q=...&limit=N&fields=...`
+- `https://openlibrary.org/search.json?author=...&limit=N&fields=...`
+- `https://openlibrary.org/search/authors.json?q=...&limit=N&start=N&sort=work_count desc`
+- `https://openlibrary.org/authors/{key}.json`
+- `https://openlibrary.org/works/{key}.json`
+- `https://openlibrary.org/isbn/{isbn}.json`
+
+**Não usar** `https://openlibrary.org/authors.json` — esse caminho devolve HTML
+(a página de navegação), não JSON. O endpoint correto de diretório é
+`search/authors.json`.
+
+**Ordenação no índice de autores:** apenas `sort=work_count desc` é aceito.
+`sort=ratings_count desc`, `sort=want_to_read_count desc` e
+`sort=ratings_average desc` devolvem lista vazia.
+
+## Preços
+
+Os preços são **simulados** e não refletem valores reais de loja. Estão
+isolados em `js/precos.js`, atrás da interface `ns.precos.obter(chave, titulo)`
+e `ns.precos.melhor(lista)`. Trocar a origem para uma API de afiliados exige
+alterar apenas esse arquivo.
+
+Regras do mock:
+
+- Determinístico: a mesma chave (`id` do livro) gera sempre os mesmos preços.
+- Faixa base de R$ 24,90 a R$ 134,90, com variação de ±17% por loja.
+- Frete: R$ 0,00 (frete grátis) ou R$ 9,90.
+- 8% dos resultados ficam indisponíveis.
+- URL de destino: busca da loja pelo título do livro.
+
+O rodapé exibe o aviso "Preços meramente ilustrativos (dados de demonstração)".
+
+### Tabela de comparação de preços
+
+| Coluna | Conteúdo |
+| --- | --- |
+| Loja | Nome da loja; badge "Melhor preço" na loja com menor valor |
+| Preço | Valor em BRL; em verde na melhor oferta |
+| Frete | "Frete grátis" ou o valor; badge "Indisponível" quando sem estoque |
+| Ação | Botão "Ir para a loja" (abre em nova aba) ou botão desabilitado "Indisponível" |
+
+"Melhor preço" = menor valor entre as lojas **com estoque**. Frete não entra no
+cálculo.
+
+## Categorias
+
+São 25, em ordem alfabética de **nome**, de Arte a Viagens. O slug é o
+identificador usado nas URLs; o campo `query` é o termo enviado à API de
+livros.
+
+| # | Nome | Slug | Query |
+| --- | --- | --- | --- |
+| 1 | Arte | `arte` | arte |
+| 2 | Autoajuda | `autoajuda` | autoajuda |
+| 3 | Biografia | `biografia` | biografia |
+| 4 | Clássicos | `classicos` | classicos da literatura |
+| 5 | Contos | `contos` | contos |
+| 6 | Didáticos | `didaticos` | livros didaticos |
+| 7 | Fantasia | `fantasia` | fantasia |
+| 8 | Ficção Científica | `ficcao-cientifica` | ficcao cientifica |
+| 9 | Filosofia | `filosofia` | filosofia |
+| 10 | Gastronomia | `gastronomia` | gastronomia culinaria |
+| 11 | História | `historia` | historia |
+| 12 | Infantil | `infantil` | livros infantis |
+| 13 | Juvenil | `juvenil` | livros juvenis |
+| 14 | Literatura Brasileira | `literatura-brasileira` | literatura brasileira |
+| 15 | Negócios | `negocios` | negocios |
+| 16 | Poesia | `poesia` | poesia |
+| 17 | Policial | `policial` | romance policial |
+| 18 | Psicologia | `psicologia` | psicologia |
+| 19 | Quadrinhos | `quadrinhos` | quadrinhos hq |
+| 20 | Religião | `religiao` | religiao |
+| 21 | Romance | `romance` | romance |
+| 22 | Suspense | `suspense` | suspense |
+| 23 | Tecnologia | `tecnologia` | tecnologia programacao |
+| 24 | Terror | `terror` | terror horror |
+| 25 | Viagens | `viagens` | viagens |
+
+A contagem exibida em cada card é um mock determinístico (40 a 300 livros por
+categoria) e **não** corresponde ao total real retornado pela API.
+
+## Autores
+
+O diretório vem de `openlibrary.org/search/authors.json`, que devolve por
+autor: chave `OL...A`, nome, datas de nascimento/óbito, número de obras
+(`work_count`), nota média (`ratings_average`), obra principal (`top_work`),
+nomes alternativos (`alternate_names`) e assuntos (`top_subjects`).
+
+Regras:
+
+- **Ordenação obrigatória por `work_count` decrescente.** É o único campo
+  ordenável no índice de autores — os demais (`ratings_count`,
+  `want_to_read_count`) devolvem lista vazia. Passamos `sort=work_count desc`
+  na própria consulta e mantemos a ordenação local como rede de segurança. A
+  ordem crua da API traz homônimos antes do autor famoso: buscar "Paulo
+  Coelho" devolve primeiro "Paulo Coelho Netto" (historiador, 17 obras) e só
+  depois Paulo Coelho (romancista, 767 obras, `OL66700A`).
+- **Listagem padrão = semente curada.** O índice tem 15,4 milhões de autores e
+  o topo por número de obras são conjuntos editoriais ("Great Britain",
+  "Anonymous", "Phone Number List"), não pessoas. Sem termo de busca a página
+  resolve `ns.AUTORES_DESTAQUE` (24 nomes) e mostra esses; a busca livre
+  alcança o índice completo.
+- **Chave canônica:** `OL...A`. A página do autor usa `id`; `nome` serve de
+  pista para resolver a chave e para listar os livros.
+- **Livros do autor:** `search.json?author={nome}`, limitado a 24 títulos e
+  ordenado por relevância. Nunca pedir `edition_key` no parâmetro `fields`
+  (infla o payload sem necessidade).
+- **Livro → autor:** o `work` do Open Library devolve `authors[].author.key`
+  e a busca devolve `author_key`. O link não exige requisição extra.
+- **Perfil completo:** `authors/{key}.json` devolve bio, foto (`photos[0]`),
+  links (Wikipédia) e identificadores externos (VIAF, ISNI, Wikidata).
+
+## Wireframe Low-Fi (Home & Detalhes)
+
+### Home (index.html)
+[HEADER: Logo | Busca | Menu: Início, Todos os Livros, Categorias, Autores]
+[HERO: Título "EconomizaLeitor" + Subtítulo + Barra de Busca com Ícone de Lupa]
+[DESTAQUES: Grade com 8 livros em destaque]
+[CATEGORIAS: Grade com as 25 categorias]
+[PROVA SOCIAL: "+10.000 comparações de preços realizadas"]
+[FOOTER: Marca, Navegar, Institucional, Redes]
+
+A ordem é: **Destaques antes de Categorias**. Existe **um** bloco de
+destaques, curadoria fixa de 10 títulos (`ns.LIVROS_DESTAQUE`), dos quais 8
+são exibidos. Não há seção separada de "Mais buscados" nem de "Menor preço".
+
+### Detalhes do Livro (livro.html)
+[HEADER]
+[BREADCRUMB: Home > Categoria > Título]
+[DETALHES:
+  - Capa (frente) e placeholder de verso
+  - Título | Subtítulo | Badges de categoria
+  - Autor (com link para a página do autor) | Editora | Ano | ISBN | Páginas | Idioma
+  - Sinopse
+  - Botão "Ver todos os livros de {autor}"
+]
+[TABELA DE COMPARAÇÃO DE PREÇOS: Loja | Preço | Frete | Ação]
+[FOOTER]
+
+A contracapa não é exibida como imagem: nenhuma API pública a fornece. O verso
+é um placeholder textual fixo, identificado como tal.
+
+### Diretório de Autores (autores.html)
+[HEADER]
+[BREADCRUMB: Home > Autores]
+[Busca por nome do autor]
+[Grade de cards: Nome | Datas | Nº de obras | Nota média | Obra principal]
+[PAGINAÇÃO]
+
+Sem termo de busca a grade mostra os 24 autores da semente curada
+(`ns.AUTORES_DESTAQUE`); com termo, mostra os resultados da busca no índice
+completo, paginados de 24 em 24.
+
+### Autor (autor.html)
+[HEADER]
+[BREADCRUMB: Home > Autores > Nome]
+[CABECALHO: Foto | Nome | Datas | Nomes alternativos | Biografia | Links externos]
+[METRICAS: Obras | Nota média | Avaliações]
+[OBRAS DO AUTOR: Grade de cards de livros]
+[FOOTER]
+
+## Navegação
+
+- Menu principal: Início (`index.html`), Todos os Livros (`livros.html`),
+  Categorias (`categorias.html`), Autores (`autores.html`).
+- Rodapé: Sobre, Termos de uso, Contato, Redes — todos apontam para `#` (sem
+  página institucional nesta entrega).
+- CTA Principal: botão "Ir para a loja" na tabela comparativa de preços.
+  **Este é o rótulo canônico.** Não existem variantes "Ver na Loja" nem
+  "Ir até a loja".
+
+## Fluxo principal
+
+Home (Busca/Categoria)
+  → Lista de Livros (`livros.html?q=` ou `?categoria=`)
+  → Detalhes do Livro (`livro.html?id=&titulo=`)
+  → Comparação de Preços
+  → Clique em "Ir para a loja"
+
+Fluxo de autor:
+
+Home → Autores (`autores.html?q=`) → Autor (`autor.html?id=&nome=`) → Livro
+(`livro.html?id=&titulo=`)
+
+## Decisões de escopo
+
+Implementado nesta entrega:
+
+- Site estático multipágina com arquivos `.html` e parâmetros em query string.
+- Preços mock isolados em adapter (`js/precos.js`).
+- Chave opcional do Google Books com degradação automática.
+- Diretório de autores + página de autor (Open Library).
+- Resolução de livro por ISBN.
+
+Fora de escopo (decidido, não são lacunas):
+
+- Páginas institucionais (Sobre, Termos de uso, Contato) — links inativos.
+- SEO técnico: sitemap.xml, robots.txt, Open Graph, canonical, dados
+  estruturados.
+- Analytics, cookies e aviso de LGPD.
+- Dados estruturados de preço, frete real e parcelamento.
+- Dark mode.
+- Backend ou build step.

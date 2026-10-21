@@ -1,0 +1,437 @@
+# Componentes do Projeto - EconomizaLeitor
+
+Especificação dos componentes de UI. Todos são renderizados por JavaScript
+em runtime, exceto onde indicado. Convenção de classes: BEM simplificado —
+`.bloco__elemento`, com `.bloco--variante` para modificadores.
+
+Todos os componentes que interpolam dados externos usam `ui.escapar()`
+(`js/components.js:14`) antes de injetar no HTML.
+
+---
+
+## 1. Header
+
+**Propósito:** navegação principal e busca rápida, presente em todas as páginas.
+
+**Estrutura:**
+```
+<header class="header">
+  <div class="container header__inner">
+    <a class="logo">Economiza<span>Leitor</span></a>
+    <div class="header__search"> <form class="search">…</form> </div>
+    <nav class="nav"> <a class="nav__link">…</a> </nav>
+    <button class="header__toggle">☰</button>
+  </div>
+</header>
+```
+
+**Conteúdo:**
+- Logo: "EconomizaLeitor" com "Economiza" em `var(--cor-primaria)` e "Leitor"
+  em `var(--cor-texto)`. Link para
+  `index.html`.
+- Busca: campo `input[type=search]` dentro de `.search`, com ícone de lupa
+  inline (SVG, `aria-hidden="true"`).
+- Menu: Início, Todos os Livros, Categorias, Autores.
+
+**Estados:**
+- `.nav__link[aria-current="page"]` — página atual, cor primária e borda
+  inferior de 2px.
+- `.header__toggle` — visível apenas abaixo de 768px. Alterna `.nav.is-open`
+  e `aria-expanded="true|false"`.
+- `.search:focus-within` — borda primária + halo de foco.
+
+**Comportamento:**
+- Submit da busca → `livros.html?q={termo}` (trim). Termo vazio não navega.
+- Sticky no topo, `z-index: 50`.
+- A busca do header e a busca do hero são formulários independentes, mas
+  compartilham a classe `.search`.
+
+---
+
+## 2. Hero
+
+**Propósito:** título, posicionamento e busca principal da Home. Exclusivo de
+`index.html`.
+
+**Estrutura:**
+```
+<section class="hero">
+  <div class="container">
+    <h1 class="hero__title">EconomizaLeitor</h1>
+    <p class="hero__subtitle">…</p>
+    <form class="search hero__search">…</form>
+  </div>
+</section>
+```
+
+**Conteúdo:**
+- `.hero__title` — "EconomizaLeitor".
+- `.hero__subtitle` — "Ache o menor preço para a sua próxima leitura."
+- `.hero__search` — mesma busca do header, mais o botão "Buscar".
+
+**Estados:** gradiente vertical branco → `--cor-fundo`, borda inferior.
+
+**Comportamento:** submit → `livros.html?q={termo}`.
+
+---
+
+## 3. Search (campo de busca)
+
+**Propósito:** campo reutilizado no header e no hero.
+
+**Estrutura:** `<form class="search" role="search">` com `.search__icon`
+(SVG 18×18), `.search__input` e, no hero, `.btn.btn--primary` "Buscar".
+
+**Estados:**
+- Normal: borda `--cor-borda`, fundo `--cor-superficie`.
+- Foco (`:focus-within`): borda `--cor-primaria` + `box-shadow` de 3px a 12%
+  de opacidade.
+
+**Comportamento:** o input do header não tem botão; o Enter no campo dispara
+o submit do formulário.
+
+---
+
+## 4. Book Card (card de livro)
+
+**Propósito:** representar um livro na listagem e nos destaques.
+
+**Estrutura:**
+```
+<article class="book-card">
+  <a href="livro.html?id={id}&titulo={titulo}"> <img class="book-card__capa"> </a>
+  <div class="book-card__body">
+    <h3 class="book-card__titulo"><a href="…">{título}</a></h3>
+    <p class="book-card__autor">{autor}</p>
+    <div class="book-card__preco preco--melhor"> R$ 00,00 <small>a partir de · {loja}</small> </div>
+  </div>
+</article>
+```
+
+**Conteúdo:** capa, título, autor, menor preço disponível e a loja dele.
+
+**Estados:**
+- `.book-card:hover` — `translateY(-2px)` e borda primária.
+- `.book-card__capa--fallback` — capa ausente ou quebrada: bloco com o título
+  centralizado, `aspect-ratio: 2/3`.
+- `.book-card__preco.preco--melhor` — preço em `--cor-destaque` (verde).
+- Sem preço disponível: o bloco mostra "preço indisponível" em texto muted.
+
+**Comportamento:**
+- O link usa `id` e `titulo` codificados; `titulo` é a pista de fallback caso
+  o `id` falhe na resolução.
+- A capa usa `loading="lazy"`.
+- Capa quebrada é trocada por um `div` de fallback com o título
+  (`ui.ligarFallbackCapas`).
+
+---
+
+## 5. Cat Card (card de categoria)
+
+**Propósito:** levar a uma das 25 categorias.
+
+**Estrutura:**
+```
+<a class="cat-card" href="categoria.html?slug={slug}">
+  <span class="cat-card__nome">{nome}</span>
+  <span class="cat-card__contagem">{n} livros</span>
+</a>
+```
+
+**Estados:** `.cat-card:hover` — `translateY(-2px)` e borda primária.
+
+**Conteúdo:** nome da categoria e contagem **mock** de livros (40 a 300,
+determinística por slug). A contagem não reflete o total real da API.
+
+---
+
+## 6. Autor Card (card de autor)
+
+**Propósito:** levar ao detalhe de um autor no diretório.
+
+**Estrutura:**
+```
+<a class="autor-card" href="autor.html?id={key}&nome={nome}">
+  <span class="autor-card__nome">{nome}</span>
+  <span class="autor-card__datas">{nasc} – {morte}</span>
+  <span class="autor-card__stats">{n} obras · ★ {nota}</span>
+  <span class="autor-card__obra">{obra principal}</span>
+</a>
+```
+
+**Conteúdo:** nome, datas de nascimento/óbito (quando existirem), número de
+obras, nota média e obra principal.
+
+**Estados:** `.autor-card:hover` — `translateY(-2px)` e borda primária.
+
+**Comportamento:** o nome vai codificado no parâmetro `nome`, usado para
+resolver a chave `OL...A` e para buscar os livros.
+
+---
+
+## 7. Breadcrumb
+
+**Propósito:** trilha de navegação, exibida em todas as páginas internas.
+
+**Estrutura:**
+```
+<nav class="breadcrumb" aria-label="Trilha de navegação">
+  <a href="index.html">Home</a>
+  <span class="breadcrumb__sep">›</span>
+  <span aria-current="page">Página atual</span>
+</nav>
+```
+
+**Estados:**
+- O item atual é `<span aria-current="page">`, sem link.
+- `.breadcrumb__sep` — cinza claro.
+- `.breadcrumb a:hover` — cor primária.
+
+**Conteúdo por página:**
+- `livros.html` — Home › Todos os Livros.
+- `categorias.html` — Home › Categorias.
+- `categoria.html` — Home › Categorias › {nome}.
+- `autores.html` — Home › Autores.
+- `autor.html` — Home › Autores › {nome}.
+- `livro.html` — Home › {categoria} › {título}. A categoria só entra quando
+  o livro é classificável em uma das 25; caso contrário, entra "Todos os
+  Livros".
+
+---
+
+## 8. Tabela de Preços
+
+**Propósito:** comparação de preço entre as lojas. Núcleo da página do livro.
+
+**Estrutura:**
+```
+<div class="tabela-precos__wrapper">
+  <caption>Comparação de preços em {n} lojas</caption>
+  <table class="tabela-precos">
+    <thead><tr><th>Loja</th><th>Preço</th><th>Frete</th><th>Ação</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="loja">{loja} <span class="badge">Melhor preço</span></td>
+        <td class="preco preco--melhor">R$ 00,00</td>
+        <td><span class="badge">Frete grátis</span></td>
+        <td><a class="btn btn--primary">Ir para a loja</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+```
+
+**Estados:**
+- Linha da melhor oferta: badge "Melhor preço" na loja e preço em verde.
+- Frete zero: badge "Frete grátis". Frete > 0: o valor em BRL.
+- Sem estoque: badge "Indisponível" e botão desabilitado.
+- `.tabela-precos tbody tr:hover` — fundo `--cor-fundo`.
+
+**Comportamento:**
+- Linhas ordenadas por preço crescente.
+- O CTA abre em nova aba com `rel="noopener nofollow sponsored"`.
+- Em telas estreitas, `.tabela-precos__wrapper` permite rolagem horizontal.
+- "Melhor preço" ignora o frete: é o menor valor entre lojas com estoque.
+
+---
+
+## 9. Badge
+
+**Propósito:** etiquetas curtas de status.
+
+**Variantes:**
+- `.badge` — padrão, fundo verde a 10% e texto `--cor-destaque`. Usado em
+  "Melhor preço" e "Frete grátis".
+- `.badge--mutado` — fundo `--cor-fundo`, texto `--cor-texto-mutado`. Usado em
+  "Indisponível" e nas categorias de um livro.
+
+**Tokens:** `font-size: 0.75rem`, `font-weight: 600`, `border-radius: 999px`,
+`padding: 2px 8px`.
+
+---
+
+## 10. Botões
+
+**Propósito:** ações.
+
+**Variantes:**
+- `.btn--primary` — fundo `--cor-primaria`, texto branco. Hover →
+  `--cor-secundaria`. Usado em "Buscar" e "Ir para a loja".
+- `.btn--outline` — borda `--cor-borda`, fundo branco. Hover → borda e texto
+  primários. Usado no estado "Indisponível" (com `disabled`).
+
+**Tokens:** `border-radius: var(--radius-sm)`, `padding: 8px 16px`,
+`font-weight: 600`, `gap: 8px`, `white-space: nowrap`.
+
+**Estados:** `:hover` com transição de 0.15s; `:disabled` com opacidade
+reduzida e `cursor: not-allowed`.
+
+---
+
+## 11. Select / Toolbar
+
+**Propósito:** filtros e ordenação.
+
+**Estrutura:**
+```
+<div class="toolbar">
+  <label class="sr-only" for="filtro-categoria">…</label>
+  <select class="select" id="filtro-categoria">…</select>
+  <label class="sr-only" for="ordenar">…</label>
+  <select class="select" id="ordenar">…</select>
+</div>
+```
+
+**Opções de ordenação (ambos os seletores):**
+- `menor-preco` — menor preço disponível primeiro. Padrão.
+- `titulo` — alfabético, `localeCompare` em `pt-BR`.
+
+**Opções de filtro (apenas em `livros.html`):** "Todas as categorias" +
+as 25 categorias.
+
+**Estados:** `.select:focus` remove o outline e aplica borda primária.
+O label é `.sr-only` (visível apenas para leitores de tela).
+
+---
+
+## 12. Paginação
+
+**Propósito:** navegar entre páginas de resultado.
+
+**Estrutura:**
+```
+<div class="paginacao">
+  <button data-pagina="0" disabled>‹</button>
+  <button data-pagina="1" aria-current="true">1</button>
+  <button data-pagina="2">2</button>
+  <button data-pagina="3">›</button>
+</div>
+```
+
+**Estados:**
+- `aria-current="true"` — botão da página atual, fundo primário.
+- `:disabled` — navegação anterior na primeira página e próxima na última.
+- `:hover:not(:disabled)` — borda e texto primários.
+
+**Comportamento:**
+- 20 itens por página em `livros.html`; 24 no diretório de autores.
+- Ao mudar de página, a rolagem sobe para o topo com comportamento suave.
+- A paginação some quando há apenas uma página.
+
+---
+
+## 13. Skeleton (carregamento)
+
+**Propósito:** placeholders enquanto a API responde.
+
+**Estrutura:**
+```
+<div class="skeleton-card" aria-hidden="true">
+  <div class="skeleton skeleton-card__capa"></div>
+  <div class="skeleton-card__body">
+    <div class="skeleton skeleton-line" style="width:90%"></div>
+    <div class="skeleton skeleton-line" style="width:60%"></div>
+    <div class="skeleton skeleton-line" style="width:40%"></div>
+  </div>
+</div>
+```
+
+**Comportamento:** gradiente animado de 1.4s em loop
+(`skeleton-loading`), com o fundo deslocando de 200% para -200%.
+`aria-hidden="true"` — o conteúdo real substitui o skeleton quando chega.
+
+**Uso:** 8 skeletons na listagem, nos destaques e no diretório de autores;
+4 na grade de obras da página do autor.
+
+---
+
+## 14. Estado (vazio e erro)
+
+**Propósito:** comunicar que não há resultado ou que algo falhou.
+
+**Estrutura:**
+```
+<div class="estado">
+  <p class="estado__titulo">{título}</p>
+  <p>{texto}</p>
+</div>
+```
+
+**Variantes:**
+- **Vazio** — "Nenhum livro encontrado" / "Tente outro termo de busca ou
+  selecione outra categoria." / "Nenhum livro nesta categoria" / "Nenhum autor
+  encontrado".
+- **Erro** — "Não foi possível carregar os livros" / "Verifique sua conexão e
+  tente novamente."
+- **Categoria inválida** — "Categoria não encontrada" / "Volte para a página
+  de categorias e escolha uma opção."
+- **Livro inválido** — "Livro não encontrado" / "Não conseguimos carregar
+  este título. Tente novamente pela busca."
+
+**Estados:** `.estado__titulo` em negrito na cor de texto; o restante em
+`--cor-texto-mutado`. Centralizado com `padding: 64px 16px`.
+
+---
+
+## 15. Stats (prova social)
+
+**Propósito:** bloco de credibilidade da Home.
+
+**Estrutura:**
+```
+<div class="stats">
+  <p class="stats__numero">+10.000</p>
+  <p class="stats__label">comparações de preços realizadas</p>
+</div>
+```
+
+**Conteúdo:** número **estático** de demonstração. Não é calculado em
+runtime e não reflete uso real.
+
+---
+
+## 16. Footer
+
+**Propósito:** navegação secundária e aviso legal.
+
+**Estrutura:** 4 colunas em `.footer__grid`:
+1. Marca — "EconomizaLeitor" + texto de posicionamento.
+2. Navegar — Início, Todos os Livros, Categorias, Autores.
+3. Institucional — Sobre, Termos de uso, Contato (todos `#`).
+4. Redes — Instagram, X, YouTube (todos `#`).
+
+**Rodapé inferior:** `© {ano} EconomizaLeitor. Preços meramente ilustrativos
+(dados de demonstração).` O ano é gerado em runtime.
+
+**Aviso de provedor:** logo abaixo, `.footer__aviso` fica oculto por padrão.
+Quando a cota da API do Google Books acaba (HTTP 429), a camada de dados
+avisa a interface e o aviso passa a exibir "Cota da API do Google Books
+esgotada — usando o Open Library." O atributo `hidden` é removido no mesmo
+momento em que a detecção ocorre.
+
+**Estados:** `.footer__lista a:hover` — cor primária.
+
+---
+
+## Regras transversais
+
+- **Escape obrigatório.** Todo dado de API passa por `ui.escapar()` antes de
+  entrar no HTML. As exceções são URLs (validadas) e conteúdo já sanitizado
+  pela camada de dados (sinopse).
+- **Sanitização de sinopse.** O Google Books devolve HTML; o Open Library
+  devolve markdown com separadores `----------` e links `[texto](url)`. A
+  camada de dados normaliza os dois para texto simples com parágrafos, sem
+  HTML. `renderSinopse` apenas escapa e divide em parágrafos.
+- **Capa quebrada.** `ui.ligarFallbackCapas(scope)` troca a `<img>` por um
+  `div` de fallback no evento `error`. Isso exige que a URL da capa realmente
+  falhe — por isso as capas do Open Library usam a rota `/b/id/{coverId}`, que
+  devolve 404 para ids inexistentes, e **não** a rota `/b/olid/{id}`, que
+  devolve 200 com imagem vazia.
+- **Identidade de página.** `ui.montarLayout(pagina)` monta header e footer e
+  marca o item de menu ativo. Valores: `home`, `livros`, `categorias`,
+  `autores`, ou string vazia na página de livro.
+- **Título do documento.** Cada página ajusta `document.title` para
+  "{nome} — EconomizaLeitor" após carregar os dados.
+- **Acessibilidade.** Landmarks (`header`, `main`, `footer`, `nav`), `aria-label`
+  nos formulários e navegação, `aria-current` no item ativo, `aria-live` nos
+  contêineres de resultado, `sr-only` em labels, `aria-hidden` nos skeletons.

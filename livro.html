@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Livro — EconomizaLeitor</title>
+  <meta name="description" content="Compare os preços deste livro em várias lojas e economize.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header data-component="header"></header>
+
+  <main>
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Trilha de navegação" data-breadcrumb>
+        <a href="index.html">Home</a>
+      </nav>
+
+      <article class="livro" data-livro>
+        <div class="estado" style="grid-column: 1 / -1;">
+          <p class="estado__titulo">Carregando livro…</p>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer data-component="footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/precos.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/pages/livro.js"></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+# Design - EconomizaLeitor (Comparador de Preços de Livros)
+
+## Personalidade
+Clara, objetiva, confiável e focada na leitura e economia.
+
+## Cores (Design Tokens)
+- Primária (Ação/Identidade): Azul Indigo `#2563EB`
+- Secundária (Apoio/Hover): Azul Escuro `#1E40AF`
+- Fundo (Canvas): Cinza Claro Suave `#F8FAFC`
+- Superfície (Cards/Header): Branco `#FFFFFF`
+- Texto Principal: Grafite `#1E293B`
+- Texto Secundário: Cinza `#64748B`
+- Destaque/Sucesso (Melhor Preço): Verde `#16A34A`
+- Borda: Cinza Suave `#E2E8F0`
+
+## Tipografia
+- Títulos (h1, h2, h3): Inter (Bold / SemiBold)
+- Corpo e Preços: Inter (Regular / Medium)
+
+### Escala tipográfica
+| Uso | Tamanho | Peso |
+| --- | --- | --- |
+| Título do hero | `clamp(2rem, 5vw, 3rem)` | 700 |
+| Título da página (h1) | `clamp(1.5rem, 4vw, 2rem)` | 700 |
+| Título de seção (h2) | `1.5rem` | 700 |
+| Título de cartão (h3) | `1rem` | 600 |
+| Preço destacado | `1.125rem` | 700 |
+| Corpo | `1rem` | 400 |
+| Autor / metadados | `0.875rem` | 400 / 500 |
+| Badge | `0.75rem` | 600 |
+| Breadcrumb | `0.875rem` | 400 |
+
+Letra negativa (`-0.02em`) nos títulos grandes. Preços usam a fonte Inter
+com algarismos tabulares quando o navegador suportar (`font-variant-numeric:
+tabular-nums`), para alinhar colunas de valores.
+
+## Escala de Espaçamento (Base 8)
+- --espaco-xs: 8px
+- --espaco-sm: 16px
+- --espaco-md: 24px
+- --espaco-lg: 32px
+- --espaco-xl: 48px
+- --espaco-2xl: 64px
+
+## Tom de Voz
+Direto, imparcial e prestativo ("Ache o menor preço para a sua próxima leitura").
+
+## Tokens CSS
+
+```css
+:root {
+  /* Cores */
+  --cor-primaria: #2563eb;
+  --cor-secundaria: #1e40af;
+  --cor-fundo: #f8fafc;
+  --cor-superficie: #ffffff;
+  --cor-texto: #1e293b;
+  --cor-texto-mutado: #64748b;
+  --cor-destaque: #16a34a;
+  --cor-borda: #e2e8f0;
+
+  /* Tipografia */
+  --fonte-principal: 'Inter', system-ui, sans-serif;
+
+  /* Espaçamento */
+  --espaco-xs: 8px;
+  --espaco-sm: 16px;
+  --espaco-md: 24px;
+  --espaco-lg: 32px;
+  --espaco-xl: 48px;
+  --espaco-2xl: 64px;
+
+  /* Borda e Sombra */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --sombra-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
+  /* Layout */
+  --largura-max: 1120px;
+  --altura-header: 72px;
+}
+```
+
+## Tokens derivados
+
+| Token | Valor | Uso |
+| --- | --- | --- |
+| `--duracao` | 0.15s | Transições de hover (cor, borda) |
+| `--duracao-media` | 0.2s | Abertura do menu mobile |
+| `--duracao-skeleton` | 1.4s | Ciclo do gradiente animado |
+| `--easing` | `ease` | Curva padrão |
+| `--z-header` | 50 | Header sticky acima do conteúdo |
+| `--gap-foco` | 3px | Largura do anel de foco |
+| `--foco-sombra` | `0 0 0 3px rgba(37, 99, 235, 0.12)` | Anel de foco primário |
+| `--grid-cartoes` | `minmax(200px, 1fr)` | Colunas do grid de livros |
+| `--grid-cartoes-compacto` | `minmax(150px, 1fr)` | Grid de livros abaixo de 640px |
+| `--grid-categorias` | `minmax(180px, 1fr)` | Colunas do grid de categorias |
+| `--grid-autores` | `minmax(220px, 1fr)` | Colunas do grid de autores |
+| `--coluna-livro` | 300px | Coluna de capa na página do livro |
+| `--gap-foco-livro` | `var(--espaco-xl)` | Gap entre grade de autores |
+
+## Layout
+
+- Container: `max-width: 1120px`, `padding-inline: 16px`, centralizado.
+- Header: altura fixa de 72px no desktop; `height: auto` com wrap abaixo de
+  768px.
+- Seção: `padding-block: 48px`.
+- Grid de livros: colunas de no mínimo 200px (`auto-fill`).
+- Grid de categorias: colunas de no mínimo 180px.
+- Grid de autores: colunas de no mínimo 220px.
+- Página do livro: `grid-template-columns: 300px 1fr`, `gap: 48px`.
+
+## Breakpoints
+
+| Largura | Mudança |
+| --- | --- |
+| ≤ 900px | Página do livro vira uma coluna; as duas capas ficam lado a lado (`max-width: 420px`, `min-width: 0`); rodapé em 2 colunas; cabeçalho do autor vira foto + texto |
+| ≤ 860px | Header empilha: logo + botão numa linha, busca e menu nas linhas seguintes; `.header__toggle` visível; `.nav` colapsa com `max-height: 0` e expande com `.is-open` |
+| ≤ 640px | Rodapé em 1 coluna; grid de livros com colunas de 150px; autor em coluna única; tabela de preços rola na horizontal com aviso "Arraste a tabela para ver todas as colunas →" |
+
+Nenhuma regra se aplica acima de 900px além do layout base.
+
+**O header em linha única exige 830px.** Logo 180px + busca 267px + menu 303px
++ dois gaps de 24px. Abaixo disso o header empilha — por isso o corte é em
+860px, e não em 768px: com o logo "EconomizaLeitor" (180px) a linha única não
+cabe em um tablet de 768px.
+
+**Item de grid não pode transbordar.** Colunas de grid e itens com
+`max-width` precisam de `min-width: 0` — sem isso o tamanho mínimo automático
+(`min-content`) vira piso e a página ganha rolagem horizontal. Vale para
+`.livro > *`, `.livro__capas` e qualquer wrapper com `overflow-x: auto`.
+
+## Movimento
+
+- Hover de cartão, botão e link: 0.15s, ease, em `transform` e `border-color`.
+- Menu mobile: `max-height` em 0.2s.
+- Skeleton: gradiente em loop de 1.4s (ease-in-out).
+- Rolagem da paginação: `window.scrollTo({ behavior: 'smooth' })`.
+- `prefers-reduced-motion: reduce` deve desativar a animação do skeleton e a
+- rolagem suave.
+
+## Estados de foco
+
+- Foco de campo (`.search:focus-within`, `.select:focus`): borda primária +
+  anel de foco `0 0 0 3px rgba(37, 99, 235, 0.12)`.
+- Foco de link e botão: contorno visível do navegador, sem remoção de
+  outline sem substituto.
+
+## Imagens
+
+- Capa de livro: `aspect-ratio: 2/3`, `object-fit: cover`, `loading="lazy"`.
+- Capa ausente ou quebrada: placeholder textual com o título, mesma
+  proporção, fundo `--cor-fundo`, texto muted, centralizado.
+- A URL da capa precisa falhar de verdade (404) para que o fallback textual
+  seja aplicado.
+- Contracapa: não há imagem disponível. O verso é um placeholder textual fixo
+  com o rótulo "Verso" e a nota "imagem indisponível".
+- Foto do autor: `photos[0]` do Open Library, `aspect-ratio: 1/1`,
+  `object-fit: cover`, arredondada.
+
+## Formatação de preço
+
+- Moeda: BRL via `Intl.NumberFormat('pt-BR', { style: 'currency',
+  currency: 'BRL' })`. Saída: `R$ 49,90`.
+- Centavos sempre presentes.
+- O preço da melhor oferta usa `--cor-destaque`; os demais, `--cor-texto`.
+- Frete zero vira o badge "Frete grátis" (não `R$ 0,00`).
+
+## Acessibilidade
+
+- Contraste: texto principal `#1E293B` sobre `#F8FAFC`; texto secundário
+  `#64748B` sobre `#FFFFFF`; primária `#2563EB` sobre branco.
+- Landmarks: `header`, `main`, `footer`, `nav` com `aria-label` quando
+  necessário.
+- `aria-current="page"` no link de menu ativo e no item de breadcrumb atual.
+- `aria-live="polite"` nos contêineres de listagem que se atualizam.
+- `aria-hidden="true"` nos skeletons e nos ícones decorativos.
+- `.sr-only` para rótulos de campos sem texto visível.
+- Foco sempre visível; nenhum `outline: none` sem substituto.
+
+## Fora de escopo
+
+- Dark mode (o `:root` tem só a paleta clara).
+- Animações de entrada em scroll.
+- Tema de alto contraste.

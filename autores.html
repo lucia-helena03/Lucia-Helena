@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autores — EconomizaLeitor</title>
+  <meta name="description" content="Diretório de autores com os livros mais procurados em várias lojas.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header data-component="header"></header>
+
+  <main>
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Trilha de navegação">
+        <a href="index.html">Home</a><span class="breadcrumb__sep">›</span>
+        <span aria-current="page">Autores</span>
+      </nav>
+
+      <div class="section__head">
+        <h1 class="section__title">Autores</h1>
+        <span data-total style="color: var(--cor-texto-mutado)"></span>
+      </div>
+
+      <form class="search busca-autores" role="search" data-busca-autores>
+        <svg class="search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+          <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input class="search__input" type="search" name="q" placeholder="Busque por nome do autor" aria-label="Buscar autores">
+        <button class="btn btn--primary" type="submit">Buscar</button>
+      </form>
+
+      <div class="grid grid--autores" data-autores aria-live="polite"></div>
+      <div class="paginacao" data-paginacao></div>
+    </div>
+  </main>
+
+  <footer data-component="footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/precos.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/pages/autores.js"></script>
+</body>
+</html>

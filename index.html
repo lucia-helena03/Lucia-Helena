@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EconomizaLeitor — Compare preços de livros</title>
+  <meta name="description" content="Ache o menor preço para a sua próxima leitura. Compare livros em várias lojas em um só lugar.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header data-component="header"></header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1 class="hero__title">EconomizaLeitor</h1>
+        <p class="hero__subtitle">Ache o menor preço para a sua próxima leitura.</p>
+        <form class="search hero__search" role="search" data-busca-hero>
+          <svg class="search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input class="search__input" type="search" name="q" placeholder="Busque por título, autor ou ISBN" aria-label="Buscar livros">
+          <button class="btn btn--primary" type="submit">Buscar</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="titulo-destaques">
+      <div class="container">
+        <div class="section__head">
+          <h2 class="section__title" id="titulo-destaques">Livros em destaque</h2>
+          <a class="section__link" href="livros.html">Ver todos</a>
+        </div>
+        <div class="grid grid--cards" data-destaques aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="titulo-categorias">
+      <div class="container">
+        <div class="section__head">
+          <h2 class="section__title" id="titulo-categorias">Navegue por categorias</h2>
+          <a class="section__link" href="categorias.html">Ver todas</a>
+        </div>
+        <div class="grid grid--categorias" data-categorias></div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="Prova social">
+      <div class="container">
+        <div class="stats">
+          <p class="stats__numero">+10.000</p>
+          <p class="stats__label">comparações de preços realizadas</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer data-component="footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/precos.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/pages/home.js"></script>
+</body>
+</html>
