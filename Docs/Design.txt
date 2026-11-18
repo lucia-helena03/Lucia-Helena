@@ -4,17 +4,25 @@
 Clara, objetiva, confiável e focada na leitura e economia.
 
 ## Cores (Design Tokens)
-- Primária (Ação/Identidade): Azul Indigo `#2563EB`
-- Secundária (Apoio/Hover): Azul Escuro `#1E40AF`
-- Fundo (Canvas): Cinza Claro Suave `#F8FAFC`
-- Superfície (Cards/Header): Branco `#FFFFFF`
+- Primária (Ação/Identidade): Verde Água `#0F766E`
+- Secundária (Apoio/Hover): Verde Água Profundo `#0B5F56`
+- Fundo (Canvas): Creme Suave `#FFF9EE`
+- Superfície (Cards/Header): Creme Suave `#FFF9EE`
 - Texto Principal: Grafite `#1E293B`
-- Texto Secundário: Cinza `#64748B`
-- Destaque/Sucesso (Melhor Preço): Verde `#16A34A`
-- Borda: Cinza Suave `#E2E8F0`
+- Texto Secundário: Grafite Suave `#334155`
+- Destaque/Sucesso (Melhor Preço): Verde Escuro `#0F3D22`
+- Borda: Marrom `#6B543A`
+- Logo (header e rodapé) — "Economiza": Marrom Escuro `#3A3129`
+- Logo (header e rodapé) — "Leitor": Marrom `#52412F`
+
+As cores de texto, link, destaque e borda permanecem escurecidas, com contraste
+bem acima de 4,5:1 sobre o creme das superfícies (3:1 para bordas). Fundo e
+superfícies usam o mesmo creme; a separação entre cards e página é feita pelas
+bordas e sombras.
 
 ## Tipografia
-- Títulos (h1, h2, h3): Inter (Bold / SemiBold)
+- Logo do header (`.logo`): Faustina (Bold), via Google Fonts
+- Títulos (h1, h2, h3), incluindo o hero: Inter (Bold / SemiBold)
 - Corpo e Preços: Inter (Regular / Medium)
 
 ### Escala tipográfica
@@ -50,17 +58,20 @@ Direto, imparcial e prestativo ("Ache o menor preço para a sua próxima leitura
 ```css
 :root {
   /* Cores */
-  --cor-primaria: #2563eb;
-  --cor-secundaria: #1e40af;
-  --cor-fundo: #f8fafc;
-  --cor-superficie: #ffffff;
+  --cor-primaria: #0f766e;
+  --cor-secundaria: #0b5f56;
+  --cor-fundo: #fff9ee;
+  --cor-superficie: #fff9ee;
   --cor-texto: #1e293b;
-  --cor-texto-mutado: #64748b;
-  --cor-destaque: #16a34a;
-  --cor-borda: #e2e8f0;
+  --cor-texto-mutado: #334155;
+  --cor-destaque: #0f3d22;
+  --cor-borda: #6b543a;
+  --cor-logo: #3a3129;
+  --cor-logo-destaque: #52412f;
 
   /* Tipografia */
   --fonte-principal: 'Inter', system-ui, sans-serif;
+  --fonte-logo: 'Faustina', Georgia, serif;
 
   /* Espaçamento */
   --espaco-xs: 8px;
@@ -91,7 +102,7 @@ Direto, imparcial e prestativo ("Ache o menor preço para a sua próxima leitura
 | `--easing` | `ease` | Curva padrão |
 | `--z-header` | 50 | Header sticky acima do conteúdo |
 | `--gap-foco` | 3px | Largura do anel de foco |
-| `--foco-sombra` | `0 0 0 3px rgba(37, 99, 235, 0.12)` | Anel de foco primário |
+| `--foco-sombra` | `0 0 0 3px rgba(15, 118, 110, 0.2)` | Anel de foco primário |
 | `--grid-cartoes` | `minmax(200px, 1fr)` | Colunas do grid de livros |
 | `--grid-cartoes-compacto` | `minmax(150px, 1fr)` | Grid de livros abaixo de 640px |
 | `--grid-categorias` | `minmax(180px, 1fr)` | Colunas do grid de categorias |
@@ -142,7 +153,7 @@ cabe em um tablet de 768px.
 ## Estados de foco
 
 - Foco de campo (`.search:focus-within`, `.select:focus`): borda primária +
-  anel de foco `0 0 0 3px rgba(37, 99, 235, 0.12)`.
+  anel de foco `0 0 0 3px rgba(15, 118, 110, 0.2)`.
 - Foco de link e botão: contorno visível do navegador, sem remoção de
   outline sem substituto.
 
@@ -168,8 +179,9 @@ cabe em um tablet de 768px.
 
 ## Acessibilidade
 
-- Contraste: texto principal `#1E293B` sobre `#F8FAFC`; texto secundário
-  `#64748B` sobre `#FFFFFF`; primária `#2563EB` sobre branco.
+- Contraste sobre `#FFF9EE`: texto principal `#1E293B` (13,96:1), texto
+  secundário `#334155` (9,88:1), primária `#0F766E` (5,22:1), destaque
+  `#0F3D22` (11,71:1), logo `#3A3129` (12,13:1) e `#52412F` (9,29:1).
 - Landmarks: `header`, `main`, `footer`, `nav` com `aria-label` quando
   necessário.
 - `aria-current="page"` no link de menu ativo e no item de breadcrumb atual.

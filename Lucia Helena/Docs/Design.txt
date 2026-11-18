@@ -1,0 +1,64 @@
+# Design - Livômetro (Comparador de Preços de Livros)
+
+## Personalidade
+Clara, objetiva, confiável e focada na leitura e economia.
+
+## Cores (Design Tokens)
+- Primária (Ação/Identidade): Azul Indigo `#2563EB`
+- Secundária (Apoio/Hover): Azul Escuro `#1E40AF`
+- Fundo (Canvas): Cinza Claro Suave `#F8FAFC`
+- Superfície (Cards/Header): Branco `#FFFFFF`
+- Texto Principal: Grafite `#1E293B`
+- Texto Secundário: Cinza `#64748B`
+- Destaque/Sucesso (Melhor Preço): Verde `#16A34A`
+- Borda: Cinza Suave `#E2E8F0`
+
+## Tipografia
+- Títulos (h1, h2, h3): Inter (Bold / SemiBold)
+- Corpo e Preços: Inter (Regular / Medium)
+
+## Escala de Espaçamento (Base 8)
+- --espaco-xs: 8px
+- --espaco-sm: 16px
+- --espaco-md: 24px
+- --espaco-lg: 32px
+- --espaco-xl: 48px
+- --espaco-2xl: 64px
+
+## Tom de Voz
+Direto, imparcial e prestativo ("Ache o menor preço para a sua próxima leitura").
+
+:root {
+  /* Cores */
+  --cor-primaria: #2563eb;
+  --cor-secundaria: #1e40af;
+  --cor-fundo: #f8fafc;
+  --cor-superficie: #ffffff;
+  --cor-texto: #1e293b;
+  --cor-texto-mutado: #64748b;
+  --cor-destaque: #16a34a;
+  --cor-borda: #e2e8f0;
+
+  /* Tipografia */
+  --fonte-principal: 'Inter', system-ui, sans-serif;
+
+  /* Espaçamento */
+  --espaco-xs: 8px;
+  --espaco-sm: 16px;
+  --espaco-md: 24px;
+  --espaco-lg: 32px;
+  --espaco-xl: 48px;
+  --espaco-2xl: 64px;
+
+  /* Borda e Sombra */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --sombra-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+body {
+  font-family: var(--fonte-principal);
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  margin: 0;
+}

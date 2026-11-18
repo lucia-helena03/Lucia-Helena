@@ -63,7 +63,7 @@ window.ECONOMIZALEITOR = window.ECONOMIZALEITOR || {};
       '<div class="container">' +
         '<div class="footer__grid">' +
           '<div>' +
-            '<div class="footer__marca">EconomizaLeitor</div>' +
+            '<div class="footer__marca">Economiza<span>Leitor</span></div>' +
             '<p class="footer__texto">Ache o menor preço para a sua próxima leitura. Comparamos livros em várias lojas para você decidir com economia.</p>' +
           '</div>' +
           '<div>' +

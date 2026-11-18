@@ -26,8 +26,8 @@ Todos os componentes que interpolam dados externos usam `ui.escapar()`
 ```
 
 **Conteúdo:**
-- Logo: "EconomizaLeitor" com "Economiza" em `var(--cor-primaria)` e "Leitor"
-  em `var(--cor-texto)`. Link para
+- Logo: "EconomizaLeitor" com "Economiza" em `var(--cor-logo)` e "Leitor"
+  em `var(--cor-logo-destaque)`, na fonte Faustina. Link para
   `index.html`.
 - Busca: campo `input[type=search]` dentro de `.search`, com ícone de lupa
   inline (SVG, `aria-hidden="true"`).
@@ -84,7 +84,7 @@ Todos os componentes que interpolam dados externos usam `ui.escapar()`
 
 **Estados:**
 - Normal: borda `--cor-borda`, fundo `--cor-superficie`.
-- Foco (`:focus-within`): borda `--cor-primaria` + `box-shadow` de 3px a 12%
+- Foco (`:focus-within`): borda `--cor-primaria` + `box-shadow` de 3px a 20%
   de opacidade.
 
 **Comportamento:** o input do header não tem botão; o Enter no campo dispara

@@ -1,16 +1,19 @@
 :root {
   /* Cores */
-  --cor-primaria: #2563eb;
-  --cor-secundaria: #1e40af;
-  --cor-fundo: #f8fafc;
-  --cor-superficie: #ffffff;
+  --cor-primaria: #0f766e;
+  --cor-secundaria: #0b5f56;
+  --cor-fundo: #fff9ee;
+  --cor-superficie: #fff9ee;
   --cor-texto: #1e293b;
-  --cor-texto-mutado: #64748b;
-  --cor-destaque: #16a34a;
-  --cor-borda: #e2e8f0;
+  --cor-texto-mutado: #334155;
+  --cor-destaque: #0f3d22;
+  --cor-borda: #6b543a;
+  --cor-logo: #3a3129;
+  --cor-logo-destaque: #52412f;
 
   /* Tipografia */
   --fonte-principal: 'Inter', system-ui, sans-serif;
+  --fonte-logo: 'Faustina', Georgia, serif;
 
   /* Espaçamento (base 8) */
   --espaco-xs: 8px;

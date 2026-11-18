@@ -1,0 +1,49 @@
+# Arquitetura do Site - Livômetro
+
+## Mapa do site
+Home (/)
+├── Todos os Livros (/livros)
+├── Categorias (/categorias)
+│   └── Categoria Específica (/categorias/[slug])
+└── Detalhes do Livro (/livro/[id-ou-isbn])
+
+## Wireframe Low-Fi (Home & Detalhes)
+
+### Home (/)
+[HEADER: Logo | Menu: Início, Todos os Livros, Categorias, Autores]
+[HERO: Título "Livômetro" + Subtítulo + Barra de Busca com Ícone de Lupa]
+[CATEGORIAS: Grade com 25 categorias de Autoajuda a Terror]
+[DESTAQUES: Cards com Livros Mais Buscados e Menor Preço]
+[PROVA SOCIAL: "Mais de 10.000 comparações realizadas"]
+[FOOTER: Links, Termos e Contato]
+
+### Página do Livro (/livro/[id])
+[HEADER]
+[BREADCRUMB: Home > Fantasia > O Hobbit]
+[DETALHES DO LIVRO:
+  - Foto Capa (Frente/Verso) | Nome do Livro
+  - Nome do Autor | Editora | ISBN-13
+  - Sinopse
+]
+[TABELA DE COMPARAÇÃO DE PREÇOS:
+  - Loja (Amazon, Mercado Livre, Magalu, Editora)
+  - Preço
+  - Botão CTA: "Ir para a loja"
+]
+[FOOTER]
+
+## Tabela de Páginas
+| Página | URL | Objetivo | Conteúdo Principal |
+| --- | --- | --- | --- |
+| Home | `/` | Busca rápida e navegação inicial por categorias | Busca, grid de 25 categorias e livros em destaque |
+| Todos os Livros | `/livros` | Catalogação geral e listagem | Lista/Grid completa de livros com filtros simples |
+| Categorias | `/categorias` | Segmentação por gênero literário | Lista completa das 25 categorias com contagem de livros |
+| Detalhes do Livro | `/livro/[id]` | Comparar preços de diversas lojas para um item específico | Foto, dados bibliográficos, sinopse e tabela comparativa de lojas |
+
+## Navegação
+- Menu principal: Início (`/`), Todos os Livros (`/livros`), Categorias (`/categorias`), Autores (`#`)
+- Rodapé: Sobre, Termos de uso, Contato e Redes
+- CTA Principal: Botão "Ver na Loja" na tabela comparativa de preços
+
+## Fluxo principal
+Home (Busca/Categoria) → Lista de Livros → Página do Livro → Comparação de Preços → Clique em "Ir até a loja"
